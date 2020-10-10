@@ -1,3 +1,8 @@
-stargan_celeba_128/models
-data/sample
-video
+#stargan_celeba_128/models
+#data/sample
+#video
+
+*.jpg
+*.png
+*.mp4
+*.ckpt
