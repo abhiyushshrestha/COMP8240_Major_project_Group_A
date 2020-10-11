@@ -8,8 +8,8 @@ IMAGE_DIRECTORY = "/images"
 
 FINAL_DIRECTORY = BASE_DIRECTORY+ IMAGE_DIRECTORY
 FINAL_IMAGE_PATH = FINAL_DIRECTORY + "/final_image"
-if not os.path.exists(FINAL_DIRECTORY + "/final_image"):
-    os.makedirs(FINAL_DIRECTORY + "/final_image")
+if not os.path.exists(BASE_DIRECTORY + "/final_image"):
+    os.makedirs(BASE_DIRECTORY + "/final_image")
 
 
 # image = cv2.imread("/media/abhiyush/New Volume/Macquarie/master_of_data_science/semester_3(session_2_2020)/COMP8240-Application_of_Data_Science/project/COMP8240_Major_project_Group_A/stargan-pytorch/data/celeba/000001.jpg")
@@ -18,11 +18,12 @@ if not os.path.exists(FINAL_DIRECTORY + "/final_image"):
 image_folders = glob.glob(FINAL_DIRECTORY + "/*")
 count = 0
 for image_folder in image_folders:
-    # print()
+    print("Processing folder {}".format(image_folder.split("/")[-1]))
     image_paths = glob.glob(image_folder + "/*.jpg")
 
     try:
         for image_path in image_paths:
+            print("Processing image {}".format(image_path.split("/")[-1]))
             image = cv2.imread(image_path)
             face_locations = face_recognition.face_locations(image)
 
