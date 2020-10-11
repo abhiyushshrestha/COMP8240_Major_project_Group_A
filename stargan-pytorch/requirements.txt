@@ -7,6 +7,6 @@ face_recognition==1.3.0
 bs4
 pytube3
 selenium
-
+tqdm==4.32.1
 
 
