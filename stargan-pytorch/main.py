@@ -106,5 +106,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr_update_step', type=int, default=1000)
 
     config = parser.parse_args()
+
+    print("**************************************")
     print(config)
     main(config)

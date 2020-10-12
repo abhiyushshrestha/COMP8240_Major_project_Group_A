@@ -13,6 +13,7 @@ class CelebA(data.Dataset):
     def __init__(self, image_dir, attr_path, selected_attrs, transform, mode):
         """Initialize and preprocess the CelebA dataset."""
         self.image_dir = image_dir
+        print("$$$$$$$$$$$$$$$$$$$", image_dir)
         self.attr_path = attr_path
         self.selected_attrs = selected_attrs
         self.transform = transform
@@ -37,10 +38,13 @@ class CelebA(data.Dataset):
             self.idx2attr[i] = attr_name
 
         lines = lines[2:]
+        print("++++++++++++++ lines:::::", lines)
         random.seed(1234)
         random.shuffle(lines)
         for i, line in enumerate(lines):
+            print("^^^^^^^^^^^^^^^^^^", line)
             split = line.split()
+            print("splittttttttt:", split)
             filename = split[0]
             values = split[1:]
 
@@ -85,6 +89,9 @@ def get_loader(image_dir, attr_path, selected_attrs, crop_size=178, image_size=1
     elif dataset == 'RaFD':
         dataset = ImageFolder(image_dir, transform)
 
+    print("-------------------------", len(dataset))
+    print(dataset)
+    print("-------------------------")
     data_loader = data.DataLoader(dataset=dataset,
                                   batch_size=batch_size,
                                   shuffle=(mode=='train'),
