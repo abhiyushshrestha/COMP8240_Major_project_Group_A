@@ -1,6 +1,9 @@
 #stargan_celeba_128/models
 #data/sample
 #video
+.idea/
+.ipynb_checkpoints
+__pycache__
 
 *.jpg
 *.png
