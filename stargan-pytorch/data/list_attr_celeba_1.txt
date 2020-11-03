@@ -1,5 +1,0 @@
-1
-Black_Hair Blond_Hair Brown_Hair Male Young 
-000001.jpg -1  1  1 -1 1
-2.jpg 1 -1 -1 1 -1
-
