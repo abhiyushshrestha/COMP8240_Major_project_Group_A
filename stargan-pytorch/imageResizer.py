@@ -4,7 +4,7 @@ import os
 
 BASE_DIRECTORY = os.getcwd()
 IMAGE_DIRECTORY = "images2/final_image"
-FINAL_RESIZED_IMAGE = "images2/resized_final_image"
+FINAL_RESIZED_IMAGE = "images2\\resized_final_image"
 
 IMAGE_TO_CROPPED_DIRECTORY = os.path.join(BASE_DIRECTORY, IMAGE_DIRECTORY)
 FINAL_RESIZED_IMAGE_DIRECTORY = os.path.join(BASE_DIRECTORY, FINAL_RESIZED_IMAGE)
