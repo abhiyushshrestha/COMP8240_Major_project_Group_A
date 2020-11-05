@@ -127,18 +127,7 @@ This work was mainly done while the first author did a research internship at [C
 ## To Scrape the image from flickr:
 To scrape for a particular search term:
 
-`python scraper.py --search "SEARCH TERM" --bbox "minimum_longitude minimum_latitude maximum_longitude maximum_latitude"`
-
-
-To scrape for a particular group:
-
-`python scraper.py --group "GROUP URL"`
-
-Where GROUP URL is something like https://www.flickr.com/groups/scenery/pool/
-
-You can also add a lat/lng coordinates to specify a geographic bounding box:
-
-`python scraper.py --search "SEARCH TERM" --bbox "minimum_longitude minimum_latitude maximum_longitude maximum_latitude"`
+`python flickrScraper.py --search "SEARCH TERM" --bbox "minimum_longitude minimum_latitude maximum_longitude maximum_latitude"`
 
 Large-sized (1024px width) will be downloaded by default. You can download the original images by passing the flag `--original`.
 
