@@ -1,4 +1,3 @@
-from __future__ import print_function
 import time
 import sys
 import json
@@ -6,15 +5,14 @@ import re
 import os
 import requests
 from tqdm import tqdm
-from bs4 import BeautifulSoup
 
-with open('credentials.json') as infile:
-    creds = json.load(infile)
+with open('flickrCredentials.json') as infile:
+    credentials = json.load(infile)
 
-KEY = creds['KEY']
-SECRET = creds['SECRET']
+KEY = credentials['KEY']
+SECRET = credentials['SECRET']
 
-def download_file(url, local_filename):
+def downloadFile(url, local_filename):
     if local_filename is None:
         local_filename = url.split('/')[-1]
     r = requests.get(url, stream=True)
@@ -38,10 +36,10 @@ def get_group_id_from_url(url):
     return results['group']['id']
 
 
-def get_photos(qs, qg, page=1, original=False, bbox=None):
+def getPhotos(q_search, page=1, original=False):
     params = {
-        'content_type': '7',
-        'per_page': '500',
+        'content_type': '1',
+        'per_page': '50',
         'media': 'photos',
         'format': 'json',
         'advanced': 1,
@@ -51,17 +49,11 @@ def get_photos(qs, qg, page=1, original=False, bbox=None):
         'api_key': KEY
     }
 
-    if qs is not None:
+    if q_search is not None:
         params['method'] = 'flickr.photos.search',
-        params['text'] = qs
-    elif qg is not None:
-        params['method'] = 'flickr.groups.pools.getPhotos',
-        params['group_id'] = qg
-
-    # bbox should be: minimum_longitude, minimum_latitude, maximum_longitude, maximum_latitude
-    if bbox is not None and len(bbox) == 4:
-        params['bbox'] = ','.join(bbox)
-
+        params['text'] = q_search
+        params['safe_search'] ='1'
+   
     results = requests.get('https://api.flickr.com/services/rest', params=params).json()
     if "photos" not in results:
         print(results)
@@ -69,12 +61,10 @@ def get_photos(qs, qg, page=1, original=False, bbox=None):
     return results["photos"]
 
 
-def search(qs, qg, bbox=None, original=False, max_pages=None,start_page=1):
+def searchData(q_search, original=False, max_pages=None,start_page=1):
     # create a folder for the query if it does not exist
-    foldername = os.path.join('images', re.sub(r'[\W]', '_', qs if qs is not None else "group_%s"%qg))
-    if bbox is not None:
-        foldername += '_'.join(bbox)
-
+    foldername = os.path.join('images', re.sub(r'[\W]', '_', q_search ))
+   
     if not os.path.exists(foldername):
         os.makedirs(foldername)
 
@@ -86,7 +76,7 @@ def search(qs, qg, bbox=None, original=False, max_pages=None,start_page=1):
         photos = []
         current_page = start_page
 
-        results = get_photos(qs, qg, page=current_page, original=original, bbox=bbox)
+        results = getPhotos(q_search, page=current_page, original=original)
         if results is None:
             return
 
@@ -99,7 +89,7 @@ def search(qs, qg, bbox=None, original=False, max_pages=None,start_page=1):
         while current_page < total_pages:
             print('downloading metadata, page {} of {}'.format(current_page, total_pages))
             current_page += 1
-            photos += get_photos(qs, qg, page=current_page, original=original, bbox=bbox)['photo']
+            photos += getPhotos(q_search, page=current_page, original=original)['photo']
             time.sleep(0.5)
 
         with open(jsonfilename, 'w') as outfile:
@@ -110,14 +100,14 @@ def search(qs, qg, bbox=None, original=False, max_pages=None,start_page=1):
             photos = json.load(infile)
 
     # download images
-    print('Downloading images')
+    print('images Downloading ')
     for photo in tqdm(photos):
         try:
             url = photo.get('url_o' if original else 'url_l')
             extension = url.split('.')[-1]
             localname = os.path.join(foldername, '{}.{}'.format(photo['id'], extension))
             if not os.path.exists(localname):
-                download_file(url, localname)
+                downloadFile(url, localname)
         except Exception as e:
             continue
 
@@ -126,34 +116,15 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Download images from flickr')
     parser.add_argument('--search', '-s', dest='q_search', default=None, required=False, help='Search term')
-    parser.add_argument('--group', '-g', dest='q_group', default=None, required=False, help='Group url, e.g. https://www.flickr.com/groups/scenery/')
     parser.add_argument('--original', '-o', dest='original', action='store_true', default=False, required=False, help='Download original sized photos if True, large (1024px) otherwise')
     parser.add_argument('--max-pages', '-m', dest='max_pages', required=False, help='Max pages (default none)')
     parser.add_argument('--start-page', '-st', dest='start_page', required=False, help='Start page (default 1)')
-    parser.add_argument('--bbox', '-b', dest='bbox', required=False, help='Bounding box to search in, separated by spaces like so: minimum_longitude minimum_latitude maximum_longitude maximum_latitude')
     args = parser.parse_args()
 
-    qs = args.q_search
-    qg = args.q_group
+    q_search = args.q_search
     original = args.original
 
-    if qs is None and qg is None:
-        sys.exit('Must specify a search term or group id')
-
-    try:
-        bbox = args.bbox.split(' ')
-    except Exception as e:
-        bbox = None
-
-    if bbox and len(bbox) != 4:
-        bbox = None
-
-    if qg is not None:
-        qg = get_group_id_from_url(qg)
-
-    print('Searching for {}'.format(qs if qs is not None else "group %s"%qg))
-    if bbox:
-        print('Within', bbox)
+ 
 
     max_pages = None
     if args.max_pages:
@@ -162,5 +133,5 @@ if __name__ == '__main__':
     if args.start_page:
         start_page = int(args.start_page)
 
-    search(qs, qg, bbox, original, max_pages, start_page)
+    searchData(q_search, original, max_pages, start_page)
 
